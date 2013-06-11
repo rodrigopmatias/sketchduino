@@ -33,5 +33,10 @@ setup(
     license='Apache 2.0',
     author='Rodrigo Pinheiro Matias',
     author_email='rodrigopmatias@gmail.com',
-    platforms='GNU/Linux Debian like'
+    platforms='GNU/Linux Debian like',
+    entry_points={
+        'console_scripts': [
+            'sketch = sketch.main'
+        ]
+    }
 )
