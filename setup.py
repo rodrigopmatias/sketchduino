@@ -36,7 +36,7 @@ setup(
     platforms='GNU/Linux Debian like',
     entry_points={
         'console_scripts': [
-            'sketch = sketch'
+            'sketch = sketch:main'
         ]
     }
 )
