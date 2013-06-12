@@ -2,25 +2,25 @@
 import sys
 
 CODERS = {
-    'BLACK': '\e[30m',
-    'RED': '\e[31m',
-    'BROW': '\e[32m',
-    'GREEN': '\e[33m',
-    'BROW': '\e[34m',
-    'CYAN': '\e[35m',
-    'MAGENTA': '\e[36m',
-    'GRAY': '\e[37m',
-    'RESET': '\e[0m',
-    'BOLD': '\e[1m',
-    'LINE': '\e[4m',
-    'BLINK': '\e[5m',
+    'BLACK': '\033[30m',
+    'RED': '\033[31m',
+    'GREEN': '\033[32m',
+    'BROW': '\033[33m',
+    'BLUE': '\033[34m',
+    'MAGENTA': '\033[35m',
+    'CYAN': '\033[36m',
+    'GRAY': '\033[37m',
+    'RESET': '\033[0m',
+    'BOLD': '\033[1m',
+    'LINE': '\033[4m',
+    'BLINK': '\033[5m',
 }
 
 
-def out(message, fd=sys.stdout, endline='\n', **params):
+def out(message, fd=sys.stdout, endline='%(RESET)s\n', **params):
     message = message if isinstance(message, str) else str(message)
     params.update(CODERS)
 
     fd.write(message % params)
-    fd.write(endline)
+    fd.write(endline % params)
     fd.flush()
