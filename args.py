@@ -7,29 +7,26 @@ def parse_args():
     parse.add_argument(
         '--processor',
         dest='mcu',
-        help='The name of Microcontroler Unit.',
-        required=True
+        help='The name of Microcontroler Unit.'
     )
 
     parse.add_argument(
         '--clock',
         dest='clock',
         help='The clock of Microcontroler Unit in MHz.',
-        required=True,
         type=float
     )
 
     parse.add_argument(
         '--sdk',
-        dest='SDK_HOME',
-        help='The path for SDK of arduino.',
-        required=True
+        dest='sdk_home',
+        help='The path for SDK of arduino.'
     )
 
     parse.add_argument(
         '--avr',
-        dest='AVR_HOME',
-        help='The path for AVR/GNU compiler.',
+        dest='avr_home',
+        help='The path for AVR/GNU compiler.'
     )
 
     parse.add_argument(
@@ -41,7 +38,7 @@ def parse_args():
 
     parse.add_argument(
         '--project',
-        dest='PROJECT_HOME',
+        dest='project_home',
         help='The home directory for project.',
         required=True
     )
