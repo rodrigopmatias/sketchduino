@@ -40,7 +40,13 @@ def parse_args():
         '--project',
         dest='project_home',
         help='The home directory for project.',
-        required=True
+        default=''
+    )
+
+    parse.add_argument(
+        '--variant',
+        dest='variant',
+        help='The variante of your arduino.'
     )
 
     return parse.parse_args().__dict__
