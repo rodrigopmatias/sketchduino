@@ -2,10 +2,11 @@
 
 templates = {
     'static_link': '''
-\t$(AR) rcs %(lib)s %(obj)s''',
+\t@$(AR) rcs %(lib)s %(obj)s
+\t@echo " [\033[33m\033[1mAR\033[0m] \033[37m\033[1m%(obj)s\033[0m to \033[37m\033[1m%(lib)s\033[0m"''',
     'obj_ruler': '''%(obj)s: %(source)s
-\t@$(CC) $(CFLAGS) $(INCLUDE) -c %(source)s -o %(obj)s
-\t@echo "Compile \033[36m\033[4m%(source)s\033[0m to \033[36m\033[4m%(obj)s\033[0m"''',
+\t@$(CC) $(CFLAGS) $(INCLUDE) -c %(source)s -o %(obj)s 2>1
+\t@echo " [\033[33m\033[1mCC\033[0m] \033[37m\033[1m%(source)s\033[0m"''',
     'main.cc': '''/**
  * Generated with sketch %(version)s
  **/
@@ -63,14 +64,16 @@ LD_FLAGS=-Os -Wl,--gc-sections -mmcu=atmega8 -lm
 all: $(HEX) $(EPP)
 
 $(HEX): $(EPP)
-\t@echo Generate HEX
-\t$(OBJCOPY) -O ihex -R .eeprom $(AOUT) $(HEX)
+\t@echo " [\033[33m\033[1mOBJCOPY\033[0m] \033[37m\033[1mFirmware\033[0m"
+\t@$(OBJCOPY) -O ihex -R .eeprom $(AOUT) $(HEX)
 
 $(EPP): $(AOUT)
-\t$(OBJCOPY) -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $(AOUT) $(EPP)
+\t@echo " [\033[33m\033[1mOBJCOPY\033[0m] \033[37m\033[1mMemory of EEPROM\033[0m"
+\t@$(OBJCOPY) -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $(AOUT) $(EPP)
 
 $(AOUT): $(OBJ) $(CORE_LIB)
-\t$(CC) $(LD_FLAGS) $(LIB) $(OBJ) $(CORE_LIB) -o $(AOUT)
+\t@echo " [\033[33m\033[1mLD\033[0m] \033[37m\033[1m$(AOUT)\033[0m"
+\t@$(CC) $(LD_FLAGS) $(LIB) $(OBJ) $(CORE_LIB) -o $(AOUT)
 
 $(CORE_LIB): $(CORE_OBJ)%(core_ruler)s
 
@@ -78,8 +81,18 @@ $(CORE_LIB): $(CORE_OBJ)%(core_ruler)s
 
 %(core_obj_rulers)s
 
+clean-tmp:
+\t@echo " [\033[33m\033[1mRM\033[0m] Clear temporary files"
+\t@rm -f tmp/*
+
+clean-bin:
+\t@echo " [\033[33m\033[1mRM\033[0m] Clear binary files"
+\t@rm -f binary/*
+
 clean:
-\trm -f tmp/*
-\trm -f binary/*
+\t@echo " [\033[33m\033[1mRM\033[0m] Clear temporary files"
+\t@rm -f tmp/*
+\t@echo " [\033[33m\033[1mRM\033[0m] Clear binary files"
+\t@rm -f binary/*
 '''
 }
