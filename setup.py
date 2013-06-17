@@ -16,27 +16,26 @@ limitations under the License.
 '''
 from setuptools import setup, find_packages
 
-import sketch
-
-def install_requires():
-    with open('requiriments.txt', 'r') as fd:
-        return fd.readlines()
+import sketchduino
 
 setup(
-    name="sketch",
-    description="Sketch Atmel Generator",
+    name="sketchduino",
+    description=" Arduino Sketch Generator",
     long_description="",
-    version=sketch.__version__,
+    version=sketchduino.__version__,
     test_suite="tests",
-    packages=find_packages(),
-    install_requires=install_requires(),
+    install_requires=[
+        'argparse',
+    ],
     license='Apache 2.0',
     author='Rodrigo Pinheiro Matias',
     author_email='rodrigopmatias@gmail.com',
     platforms='GNU/Linux Debian like',
+    include_package_data=True,
+    packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'sketch = sketch:main'
+            'sketchduino = sketchduino:main'
         ]
     }
 )
