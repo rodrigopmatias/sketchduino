@@ -5,7 +5,7 @@ templates = {
 \t@$(AR) rcs %(lib)s %(obj)s
 \t@echo " [\033[33m\033[1mAR\033[0m] \033[37m\033[1m%(obj)s\033[0m to \033[37m\033[1m%(lib)s\033[0m"''',
     'obj_ruler': '''%(obj)s: %(source)s
-\t@$(CC) $(CFLAGS) $(INCLUDE) -c %(source)s -o %(obj)s 2>1
+\t@$(CC) $(CFLAGS) $(INCLUDE) -c %(source)s -o %(obj)s 2> /dev/null 1> /dev/null
 \t@echo " [\033[33m\033[1mCC\033[0m] \033[37m\033[1m%(source)s\033[0m"''',
     'main.cc': '''/**
  * Generated with sketch %(version)s

@@ -167,7 +167,7 @@ def create_or_update_makefile(sdk_source_dir, **params):
 
     params.update(
         version=__version__,
-        clock_hz=long((params.get('clock', 0) or 0) * 10 ** 6),
+        clock_hz=int((params.get('clock', 0) or 0) * 10 ** 6),
         project_name=project_home.split(os.path.sep)[-1],
         core_obj_dep=' '.join(
             sources_to_objects(core_sources, prefix='core')
