@@ -30,9 +30,16 @@ setup(
     license='Apache 2.0',
     author='Rodrigo Pinheiro Matias',
     author_email='rodrigopmatias@gmail.com',
-    platforms='GNU/Linux Debian like',
+    platforms='GNU/Linux',
     include_package_data=True,
-    packages=find_packages(),
+    package_dir={'': './'},
+    packages=['', 'sketchduino'],
+    package_data={
+        '': [
+            '*.md',
+            '*.rst'
+        ]
+    },
     entry_points={
         'console_scripts': [
             'sketchduino = sketchduino:main'

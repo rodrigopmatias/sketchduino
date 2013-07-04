@@ -1,4 +1,19 @@
 # -*- coding: utf-8 -*-
+'''
+Copyright 2012 Rodrigo Pinheiro Matias <rodrigopmatias@gmail.com>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+'''
 
 templates = {
     'static_link': '''
@@ -38,6 +53,8 @@ CC=%(cc)s
 LD=%(ld)s
 AR=%(ar)s
 OBJCOPY=%(objcopy)s
+AVRDUDE=%(avrdude)s
+PROGRAMER=%(programer)s
 LIB=
 INCLUDE=-I$(ARDUINO_CORE)/arduino -I$(ARDUINO_VARIANT) -I$(ARDUINO_CORE)
 
@@ -61,7 +78,12 @@ EPP=binary/%(project_name)s-%(mcu)s.epp
 CORE_LIB=binary/core.a
 LD_FLAGS=-Os -Wl,--gc-sections -mmcu=atmega8 -lm
 
+AVRDUDE_OPTIONS = -p$(MCU) -c$(PROGRAMER) -Pusb -Uflash:w:$(HEX):i
+
 all: $(HEX) $(EPP)
+
+deploy: $(HEX)
+\t$(AVRDUDE) $(AVRDUDE_OPTIONS)
 
 $(HEX): $(EPP)
 \t@echo " [\033[33m\033[1mOBJCOPY\033[0m] \033[37m\033[1mFirmware\033[0m"

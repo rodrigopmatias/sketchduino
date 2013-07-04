@@ -1,4 +1,20 @@
 # -*- coding: utf-8 -*-
+'''
+Copyright 2012 Rodrigo Pinheiro Matias <rodrigopmatias@gmail.com>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+'''
+
 from sketchduino.screen import out
 from sketchduino.args import parse_args
 from sketchduino.template import templates
@@ -9,7 +25,7 @@ import codecs
 import json
 import subprocess as sp
 
-__version__ = '0.1.6'
+__version__ = '0.1.7'
 
 def sdk_refresh(params):
     sdk_home = params.get('sdk_home')
@@ -49,9 +65,10 @@ def find_avr_toolchain(params):
                 ])
             )
 
-        avr_bindir = os.path.join(params.get('avr_home'), 'bin')
-        avr_includedir = os.path.join(params.get('avr_home'), 'include')
-        avr_libdir = os.path.join(params.get('avr_home'), 'lib')
+        avr_home = params.get('avr_home')
+        avr_bindir = os.path.join(avr_home, 'bin')
+        avr_includedir = os.path.join(avr_home, 'include')
+        avr_libdir = os.path.join(avr_home, 'lib')
 
         params.update(
             cc=search(re.compile('^(avr\-g\+\+|g\+\+)$'), [avr_bindir, '/usr/bin'], 'not found'),
@@ -59,7 +76,8 @@ def find_avr_toolchain(params):
             objcopy=search(re.compile('^(avr\-objcopy|objcopy)$'), [avr_bindir, '/usr/bin'], 'not found'),
             avr_include=avr_includedir,
             avr_lib=avr_libdir,
-            ar=search(re.compile('^(avr\-ar|ar)$'), [avr_bindir, '/usr/bin'], 'not found')
+            ar=search(re.compile('^(avr\-ar|ar)$'), [avr_bindir, '/usr/bin'], 'not found'),
+            avrdude=search(re.compile('^avrdude(|64)$'), [avr_home, '/usr/bin'], 'not found')
         )
 
     return params
@@ -283,6 +301,7 @@ def show_command(**params):
     out(' - %(CYAN)s%(BOLD)sVariants%(RESET)s: %(sdk_variant_dir)s', **params)
     out(' - %(CYAN)s%(BOLD)sLibraries%(RESET)s: %(sdk_libary_dir)s', **params)
     out(' - %(CYAN)s%(BOLD)sSources%(RESET)s: %(sdk_source_dir)s', **params)
+    out(' - %(CYAN)s%(BOLD)sPROGRAMER%(RESET)s: %(programer)s', **params)
     out('%(CYAN)s%(BOLD)sAVR Compiler%(RESET)s: %(avr_home)s', **params)
     out(' - %(CYAN)s%(BOLD)scc%(RESET)s: %(cc)s', **params)
     out(' - %(CYAN)s%(BOLD)sLD%(RESET)s: %(ld)s', **params)

@@ -1,37 +1,49 @@
 sketchduino
 ===========
 
-The Arduino IDE is a very good tool when you are learning to develop for AVR family of microcontrollers, but it becomes a barrier to more structured projects. In view of these difficulties it was decided to create a tool to automate the creation and maintenance of projects.
+The Arduino IDE is a very good tool when you are learning to develop for
+AVR family of microcontrollers, but it becomes a barrier to more
+structured projects. In view of these difficulties it was decided to
+create a tool to automate the creation and maintenance of projects.
 
-The sketchduino will create a complete project, a project will be created with the following structure:
+The sketchduino will create a complete project, a project will be
+created with the following structure:
 
- - binary (result of compile processes)
- - lib (custom libraries of projetct future)
- - include (custom libraries of projetct future)
- - src (the code of you project)
- - tmp (temporary files of processes of compiler)
+-  binary (result of compile processes)
+-  lib (custom libraries of projetct future)
+-  include (custom libraries of projetct future)
+-  src (the code of you project)
+-  tmp (temporary files of processes of compiler)
 
 How to install this
 -------------------
 
-To install sketchduino is very simple, as it is a python tool you can install it using the tool easy_install or pip is the second most recommended.
+To install sketchduino is very simple, as it is a python tool you can
+install it using the tool easy\_install or pip is the second most
+recommended.
 
-See how we can install using easy_install:
+See how we can install using easy\_install:
 
-> ``root@host ~/ # easy_install sketchduino``
+    ``root@host ~/ # easy_install sketchduino``
 
-With this command will be installed and its dependencies sketchduino Site Packages Python.
+With this command will be installed and its dependencies sketchduino
+Site Packages Python.
 
 Now see how to install using pip:
 
-> ``root@host ~/ # easy_install sketchduino``
+    ``root@host ~/ # easy_install sketchduino``
 
-With this command will be installed and its dependencies sketchduino Site Packages Python.
+With this command will be installed and its dependencies sketchduino
+Site Packages Python.
 
 How to use this
 ---------------
 
-The sketchduino is a command line tool, but its use is very simple and can be easyly integrated with some good editor such as Vim and SublimeText. Let's see how to use sketchduino.
+The sketchduino is a command line tool, but its use is very simple and
+can be easyly integrated with some good editor such as Vim and
+SublimeText. Let's see how to use sketchduino.
+
+::
 
     user@host ~/ $ sketchduino --help
     usage: sketchduino [-h] [--processor MCU] [--clock CLOCK] [--sdk SDK_HOME]
@@ -56,7 +68,10 @@ The sketchduino is a command line tool, but its use is very simple and can be ea
 Command Help
 ------------
 
-The secret of this tool is are your commands and you can see the list of commands with the following command:
+The secret of this tool is are your commands and you can see the list of
+commands with the following command:
+
+::
 
     user@host ~/ $ sketchduino --cmd help
     Start of Arduino Sketch Utility.
