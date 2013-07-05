@@ -4,6 +4,11 @@ python:
     - "3.2"
     - "pypy"
 install:
+    - pip install --use-mirrors nose
+    - pip install --use-mirrors coverage
     - pip install -e .
+before_install:
+    - wget https://dl.dropboxusercontent.com/u/852780/mock-toolchain.tar.gz
+    - tar xzf mock-toolchain.tar.gz
 script:
-    - sketchduino -h
+    - nosetests sketchduino/tests/commands.py --with-coverage --cover-package=sketchduino
