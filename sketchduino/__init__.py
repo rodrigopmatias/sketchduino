@@ -51,6 +51,7 @@ def search(regexp, directory, notfound=None):
                 break
         if flag is True:
             break
+
     return notfound
 
 def find_avr_toolchain(params):
@@ -87,13 +88,13 @@ def expand_project_path(params):
         project_home=os.path.abspath(params.get('project_home'))
     )
 
-    project_dir = params.get('project_home')
+    project_home = params.get('project_home')
 
     params.update(
-        source_dir=os.path.join(project_dir, 'src'),
-        lib_dir=os.path.join(project_dir, 'lib'),
-        bin_dir=os.path.join(project_dir, 'binary'),
-        include_dir=os.path.join(project_dir, 'include'),
+        source_dir=os.path.join(project_home, 'src'),
+        lib_dir=os.path.join(project_home, 'lib'),
+        bin_dir=os.path.join(project_home, 'binary'),
+        include_dir=os.path.join(project_home, 'include'),
     )
 
     return params
