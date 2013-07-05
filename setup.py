@@ -32,14 +32,7 @@ setup(
     author_email='rodrigopmatias@gmail.com',
     platforms='GNU/Linux',
     include_package_data=True,
-    package_dir={'': './'},
-    packages=['', 'sketchduino'],
-    package_data={
-        '': [
-            '*.md',
-            '*.rst'
-        ]
-    },
+    packages=['sketchduino'],
     entry_points={
         'console_scripts': [
             'sketchduino = sketchduino:main'
