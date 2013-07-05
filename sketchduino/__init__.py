@@ -120,7 +120,7 @@ def command_not_found(**kargs):
 def create_directory_tree(directory):
     if os.path.isdir(directory) is False:
         parent = os.path.dirname(directory)
-        if parent != '/':
+        if parent not in ('/', '.', '..', ''):
             create_directory_tree(parent)
         os.mkdir(directory)
         return '+'
