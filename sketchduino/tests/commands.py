@@ -40,18 +40,18 @@ class CreateCommandTestCase(TestCase):
 class HelpCommandTestCase(TestCase):
 
     def test_show(self):
-        with sp.Popen('sketchduino -h', shell=True, stdout=sp.PIPE, stderr=sp.PIPE) as fd:
-            fd.wait()
+        fd = sp.Popen('sketchduino -h', shell=True, stdout=sp.PIPE, stderr=sp.PIPE)
+        fd.wait()
 
-            self.assertEqual(fd.returncode, 0)
-            assert len(fd.stdout.read()) > 0
-            assert len(fd.stderr.read()) == 0
+        self.assertEqual(fd.returncode, 0)
+        assert len(fd.stdout.read()) > 0
+        assert len(fd.stderr.read()) == 0
 
     def test_command_show(self):
-        with sp.Popen('sketchduino --cmd help', shell=True, stdout=sp.PIPE, stderr=sp.PIPE) as fd:
-            fd.wait()
+        fd = sp.Popen('sketchduino --cmd help', shell=True, stdout=sp.PIPE, stderr=sp.PIPE)
+        fd.wait()
 
-            self.assertEqual(fd.returncode, 0)
-            assert len(fd.stdout.read()) > 0
-            assert len(fd.stderr.read()) == 0
+        self.assertEqual(fd.returncode, 0)
+        assert len(fd.stdout.read()) > 0
+        assert len(fd.stderr.read()) == 0
 
