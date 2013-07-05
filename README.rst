@@ -1,6 +1,8 @@
 sketchduino
 ===========
 
+The next version of this tool on 07/16/2013 previta to be published at any time, provided that all requirements for the next release is reached.
+
 |Build Status| |PyPy compatible|
 
 .. |Build Status| image:: https://travis-ci.org/rodrigopmatias/sketchduino.png

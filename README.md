@@ -1,6 +1,8 @@
 sketchduino
 ===========
 
+The next version of this tool on 07/16/2013 previta to be published at any time, provided that all requirements for the next release is reached.
+
 [![Build Status](https://travis-ci.org/rodrigopmatias/sketchduino.png)](https://travis-ci.org/rodrigopmatias/sketchduino)
 [![PyPy compatible](https://pypip.in/v/sketchduino/badge.png)](https://pypi.python.org/pypi/sketchduino)
 
