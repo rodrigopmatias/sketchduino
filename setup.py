@@ -21,9 +21,8 @@ import sketchduino
 setup(
     name="sketchduino",
     description=" Arduino Sketch Generator",
-    long_description="",
+    long_description=open('README.rst').read(),
     version=sketchduino.__version__,
-    test_suite="tests",
     install_requires=[
         'argparse',
     ],
