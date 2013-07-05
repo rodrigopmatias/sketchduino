@@ -111,6 +111,9 @@ def not_implemented(**kargs):
 
 
 def command_not_found(**kargs):
+    '''
+    Commando não encontrado.
+    '''
     out('The command %(RED)s%(BLINK)s%(command)s%(RESET)s not found!', **kargs)
 
 
@@ -338,6 +341,9 @@ def show_command(**params):
 
 
 def variant_list(sdk_variant_dir, variant, **params):
+    '''
+    Mostra a lista de variantes reconhecida pela SDK do arduino.
+    '''
     for pathname in os.listdir(sdk_variant_dir):
         path = os.path.join(sdk_variant_dir, pathname)
         if os.path.isdir(path) and variant == pathname:
