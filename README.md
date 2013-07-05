@@ -1,6 +1,8 @@
 sketchduino
 ===========
 
+[![Build Status](https://travis-ci.org/rodrigopmatias/sketchduino.png)](https://travis-ci.org/rodrigopmatias/sketchduino)
+
 The Arduino IDE is a very good tool when you are learning to develop for AVR family of microcontrollers, but it becomes a barrier to more structured projects. In view of these difficulties it was decided to create a tool to automate the creation and maintenance of projects.
 
 The sketchduino will create a complete project, a project will be created with the following structure:
