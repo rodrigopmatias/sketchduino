@@ -27,6 +27,20 @@ class CommandTestCase(ProjectBaseTestCase, TestCase):
 
 class HelpersTestCase(ProjectBaseTestCase, TestCase):
 
+    def test_create_directory_tree(self):
+        nodes = [
+            os.path.join('root', 'node1'),
+            os.path.join('root', 'node2'),
+            os.path.join('root', 'node3'),
+        ]
+
+        for node in nodes:
+            create_directory_tree(node)
+
+        for node in nodes:
+            self.assertTrue(os.path.exists(node))
+
+
     def test_src_to_obj(self):
         assert src_to_obj('main.c') == 'main.o'
         assert src_to_obj('main.cc') == 'main.o'
