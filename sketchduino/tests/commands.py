@@ -18,16 +18,12 @@ class ProjectBaseTestCase(object):
     def tearDownClass(cls):
         pass
 
-# class CreateCommandTestCase(TestCase):
 
-#     def test_call(self):
-#         assert False
+class CommandTestCase(ProjectBaseTestCase, TestCase):
 
-#     def test_structure(self):
-#         assert False
+    def test_create_or_update(self):
+        assert False
 
-#     def test_makefile(self):
-#         assert False
 
 class HelpersTestCase(ProjectBaseTestCase, TestCase):
 
@@ -117,7 +113,7 @@ class HelpersTestCase(ProjectBaseTestCase, TestCase):
                 'tools',
                 'avr',
                 'avrdude64'
-            ]) or \
+            ]) or
             rst.get('avrdude', None) == os.path.sep.join([
                 self.conf.get('sdk_home'),
                 'hardware',
@@ -127,7 +123,6 @@ class HelpersTestCase(ProjectBaseTestCase, TestCase):
             ])
         )
 
-
     def test_search(self):
         found_re = re.compile('^(avr\-g\+\+|g\+\+)$')
         notfound_re = re.compile('^notfound$')
@@ -135,12 +130,10 @@ class HelpersTestCase(ProjectBaseTestCase, TestCase):
         conf = find_avr_toolchain(self.conf)
         avr_bindir = os.path.join(conf.get('avr_home'), 'bin')
 
-
         rst = search(found_re, avr_bindir), search(notfound_re, avr_bindir)
 
         self.assertEqual(rst[0], os.path.join(avr_bindir, 'avr-g++'))
         self.assertEqual(rst[1], None)
-
 
     def test_sdk_refresh(self):
         rst = sdk_refresh(self.conf)
@@ -161,7 +154,6 @@ class HelpersTestCase(ProjectBaseTestCase, TestCase):
             rst.get('sdk_libary_dir', None),
             os.path.sep.join([sdk_home, 'libraries'])
         )
-
 
     def test_expand_project(self):
         rst = expand_project_path(self.conf)
@@ -189,4 +181,3 @@ class HelpersTestCase(ProjectBaseTestCase, TestCase):
 
 class HelpCommandTestCase(TestCase):
     pass
-

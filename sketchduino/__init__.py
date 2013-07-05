@@ -14,7 +14,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
-
 from sketchduino.screen import out
 from sketchduino.args import parse_args
 from sketchduino.template import templates
@@ -25,7 +24,8 @@ import codecs
 import json
 import subprocess as sp
 
-__version__ = '0.1.9'
+__version__ = '0.2.0'
+
 
 def sdk_refresh(params):
     sdk_home = params.get('sdk_home')
@@ -37,6 +37,7 @@ def sdk_refresh(params):
     )
 
     return params
+
 
 def search(regexp, directory, notfound=None):
     directories = [directory] if isinstance(directory, (tuple, list)) is False else directory
@@ -53,6 +54,7 @@ def search(regexp, directory, notfound=None):
             break
 
     return notfound
+
 
 def find_avr_toolchain(params):
     if params.get('avr_home') is not None or params.get('sdk_home') is not None:
@@ -83,6 +85,7 @@ def find_avr_toolchain(params):
 
     return params
 
+
 def expand_project_path(params):
     params.update(
         project_home=os.path.abspath(params.get('project_home'))
@@ -99,14 +102,17 @@ def expand_project_path(params):
 
     return params
 
+
 def not_implemented(**kargs):
     '''
     Comando não implementado até o momento.
     '''
     out('Not implemented command %(RED)s%(BLINK)s%(command)s', **kargs)
 
+
 def command_not_found(**kargs):
     out('The command %(RED)s%(BLINK)s%(command)s%(RESET)s not found!', **kargs)
+
 
 def create_directory_tree(directory):
     if os.path.isdir(directory) is False:
@@ -117,6 +123,7 @@ def create_directory_tree(directory):
         return '+'
     else:
         return 'S'
+
 
 def scan_for_sources(path, basepath=None):
     is_source = lambda filename: re.match('^.*\.(c|cc|cpp|cxx)$', filename) is not None
@@ -132,6 +139,7 @@ def scan_for_sources(path, basepath=None):
 
     return files
 
+
 def src_to_obj(src):
     if src.endswith('.c'):
         return src.replace('c', 'o')
@@ -144,6 +152,7 @@ def src_to_obj(src):
     else:
         return None
 
+
 def sources_to_objects(sources, prefix=''):
     objs = []
     for src in sources:
@@ -154,6 +163,7 @@ def sources_to_objects(sources, prefix=''):
         objs.append(os.path.join('tmp', src))
 
     return objs
+
 
 def ruler_for(sources, source_dir='', obj_dir='', prefix=''):
     rulers = []
@@ -167,6 +177,7 @@ def ruler_for(sources, source_dir='', obj_dir='', prefix=''):
 
     return '\n\n'.join(rulers)
 
+
 def core_ruler(sources, prefix, obj_dir, library):
     rst = []
 
@@ -178,6 +189,7 @@ def core_ruler(sources, prefix, obj_dir, library):
         })
 
     return rst
+
 
 def create_or_update_makefile(sdk_source_dir, **params):
     project_home = params.get('project_home')
@@ -208,6 +220,7 @@ def create_or_update_makefile(sdk_source_dir, **params):
 
     return rst
 
+
 def create_main(**params):
     project_home = params.get('project_home')
     params.update(
@@ -224,6 +237,7 @@ def create_main(**params):
             fd.write(templates.get('main.cc') % params)
 
     return rst
+
 
 def create_or_update_command(command=None, **kargs):
     '''
@@ -252,6 +266,7 @@ def create_or_update_command(command=None, **kargs):
 
     out('', **params)
 
+
 def load_sketch_conf(project_home):
     params = None
 
@@ -263,6 +278,7 @@ def load_sketch_conf(project_home):
 
     return params
 
+
 def apply_if(a, b):
     for key, value in b.items():
         if a.get(key, None) is None:
@@ -270,11 +286,13 @@ def apply_if(a, b):
 
     return a
 
+
 def rebuild_command(project_home, **params):
     '''
     Executa a limpeza do cache de compilação e realiza uma nova compilação completa.
     '''
     sp.call('cd %s && make clean && make' % project_home, shell=True)
+
 
 def build_command(project_home, **params):
     '''
@@ -283,11 +301,13 @@ def build_command(project_home, **params):
     '''
     sp.call('cd %s && make' % project_home, shell=True)
 
+
 def clean_command(project_home, **params):
     '''
     Executa limpeza da ultima compilação.
     '''
     sp.call('cd %s && make clean' % project_home, shell=True)
+
 
 def show_command(**params):
     '''
@@ -316,6 +336,7 @@ def show_command(**params):
     out(' - %(CYAN)s%(BOLD)sBinary%(RESET)s: %(bin_dir)s', **params)
     out(' - %(CYAN)s%(BOLD)sInclude%(RESET)s: %(include_dir)s', **params)
 
+
 def variant_list(sdk_variant_dir, variant, **params):
     for pathname in os.listdir(sdk_variant_dir):
         path = os.path.join(sdk_variant_dir, pathname)
@@ -323,6 +344,7 @@ def variant_list(sdk_variant_dir, variant, **params):
             out(' %(GREEN)s%(BOLD)s%(pathname)s', pathname=pathname)
         elif os.path.isdir(path):
             out(' %(GREEN)s%(pathname)s', pathname=pathname)
+
 
 def main():
     params = parse_args()
