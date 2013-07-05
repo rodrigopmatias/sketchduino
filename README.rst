@@ -1,6 +1,13 @@
 sketchduino
 ===========
 
+|Build Status| |PyPy compatible|
+
+.. |Build Status| image:: https://travis-ci.org/rodrigopmatias/sketchduino.png
+   :target: https://travis-ci.org/rodrigopmatias/sketchduino
+.. |PyPy compatible| image:: https://pypip.in/v/sketchduino/badge.png
+   :target: https://pypi.python.org/pypi/sketchduino
+
 The Arduino IDE is a very good tool when you are learning to develop for
 AVR family of microcontrollers, but it becomes a barrier to more
 structured projects. In view of these difficulties it was decided to
