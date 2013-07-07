@@ -63,7 +63,12 @@ def parse_args():
         '--programer',
         dest='programer',
         help='The programer hardware for deploy you firmwire.',
-        default='usbasp'
+    )
+
+    parse.add_argument(
+        '--serial',
+        dest='serial',
+        help='The serial port for comunication with hardware.',
     )
 
     parse.add_argument(

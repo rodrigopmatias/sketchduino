@@ -24,7 +24,7 @@ import codecs
 import json
 import subprocess as sp
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 
 def sdk_refresh(params):
@@ -325,7 +325,8 @@ def show_command(**params):
     out(' - %(CYAN)s%(BOLD)sVariants%(RESET)s: %(sdk_variant_dir)s', **params)
     out(' - %(CYAN)s%(BOLD)sLibraries%(RESET)s: %(sdk_libary_dir)s', **params)
     out(' - %(CYAN)s%(BOLD)sSources%(RESET)s: %(sdk_source_dir)s', **params)
-    out(' - %(CYAN)s%(BOLD)sPROGRAMER%(RESET)s: %(programer)s', **params)
+    out(' - %(CYAN)s%(BOLD)sProgramer%(RESET)s: %(programer)s', **params)
+    out(' - %(CYAN)s%(BOLD)sSerial port%(RESET)s: %(serial)s', **params)
     out('%(CYAN)s%(BOLD)sAVR Compiler%(RESET)s: %(avr_home)s', **params)
     out(' - %(CYAN)s%(BOLD)scc%(RESET)s: %(cc)s', **params)
     out(' - %(CYAN)s%(BOLD)sLD%(RESET)s: %(ld)s', **params)

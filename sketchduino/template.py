@@ -25,20 +25,20 @@ templates = {
     'main.cc': '''/**
  * Generated with sketch %(version)s
  **/
- #include <Arduino.h>
+#include <Arduino.h>
 
 /**
  * Setup of the firmware
  **/
- void setup() {
- }
+void setup() {
+}
 
 /**
  * Schedule events for firmware program
  **/
- void loop() {
+void loop() {
     delay(250);
- }''',
+}''',
     'Makefile': '''##########################################
 # Makefile generated with sketch %(version)s
 ##########################################
@@ -46,7 +46,7 @@ templates = {
 # Defines of Arduino
 ARDUINO_HOME=%(sdk_home)s
 ARDUINO_CORE=$(ARDUINO_HOME)/hardware/arduino/cores
-ARDUINO_VARIANT=$(ARDUINO_HOME)/hardware/arduino/variants/standard
+ARDUINO_VARIANT=$(ARDUINO_HOME)/hardware/arduino/variants/%(variant)s
 
 # Define toolchain
 CC=%(cc)s
@@ -76,9 +76,9 @@ AOUT=binary/%(project_name)s-%(mcu)s.elf
 HEX=binary/%(project_name)s-%(mcu)s.hex
 EPP=binary/%(project_name)s-%(mcu)s.epp
 CORE_LIB=binary/core.a
-LD_FLAGS=-Os -Wl,--gc-sections -mmcu=atmega8 -lm
+LD_FLAGS=-Os -Wl,--gc-sections -mmcu=$(MCU) -lm
 
-AVRDUDE_OPTIONS = -p$(MCU) -c$(PROGRAMER) -Pusb -Uflash:w:$(HEX):i
+AVRDUDE_OPTIONS = -p$(MCU) -c$(PROGRAMER) -P%(serial)s -Uflash:w:$(HEX):i
 
 all: $(HEX) $(EPP)
 
