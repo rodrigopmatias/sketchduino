@@ -24,16 +24,16 @@ import codecs
 import json
 import subprocess as sp
 
-__version__ = '0.2.1'
+__version__ = '0.3.1'
 
 
 def sdk_refresh(params):
     sdk_home = params.get('sdk_home')
 
     params.update(
-        sdk_variant_dir=os.path.sep.join([sdk_home, 'hardware', 'arduino', 'variants']),
-        sdk_source_dir=os.path.sep.join([sdk_home, 'hardware', 'arduino', 'cores', 'arduino']),
-        sdk_libary_dir=os.path.sep.join([sdk_home, 'libraries']),
+        sdk_variant_dir=os.path.sep.join([sdk_home, 'hardware', 'arduino', 'variants']) if sdk_home else '',
+        sdk_source_dir=os.path.sep.join([sdk_home, 'hardware', 'arduino', 'cores', 'arduino']) if sdk_home else '',
+        sdk_libary_dir=os.path.sep.join([sdk_home, 'libraries']) if sdk_home else '',
     )
 
     return params
@@ -133,12 +133,13 @@ def scan_for_sources(path, basepath=None):
     files = []
     basepath = basepath if basepath else path
 
-    for attr in os.listdir(path):
-        filepath = os.path.join(path, attr)
-        if attr not in ('.', '..') and os.path.isdir(filepath):
-            files = files + scan_for_sources(filepath, basepath)
-        elif os.path.isfile(filepath) and is_source(attr):
-            files.append(os.path.relpath(filepath, basepath))
+    if os.path.isdir(path) is True:
+        for attr in os.listdir(path):
+            filepath = os.path.join(path, attr)
+            if attr not in ('.', '..') and os.path.isdir(filepath):
+                files = files + scan_for_sources(filepath, basepath)
+            elif os.path.isfile(filepath) and is_source(attr):
+                files.append(os.path.relpath(filepath, basepath))
 
     return files
 
@@ -219,7 +220,7 @@ def create_or_update_makefile(sdk_source_dir, **params):
     rst = 'U' if os.path.isfile(filename) else 'C'
 
     with codecs.open(filename, 'w', 'utf-8') as fd:
-        fd.write(templates.get('Makefile') % params)
+        fd.write(templates.get('Makefile' if params.get('variant') != 'avr' else 'avr-Makefile') % params)
 
     return rst
 
@@ -237,7 +238,7 @@ def create_main(**params):
     rst = 'S' if os.path.isfile(filename) else 'C'
     if rst == 'C':
         with codecs.open(filename, 'w', 'utf-8') as fd:
-            fd.write(templates.get('main.cc') % params)
+            fd.write(templates.get('main.cc' if params.get('variant') != 'avr' else 'avr-main.cc') % params)
 
     return rst
 
@@ -318,39 +319,53 @@ def show_command(**params):
     '''
     params = expand_project_path(params)
 
-    out('%(CYAN)s%(BOLD)sMCU name%(RESET)s: %(mcu)s', **params)
-    out('%(CYAN)s%(BOLD)sMCU clock%(RESET)s: %(clock)0.2f MHz', **params)
-    out('%(CYAN)s%(BOLD)sVariant%(RESET)s: %(variant)s', **params)
-    out('%(CYAN)s%(BOLD)sArduino SDK%(RESET)s: %(sdk_home)s', **params)
-    out(' - %(CYAN)s%(BOLD)sVariants%(RESET)s: %(sdk_variant_dir)s', **params)
-    out(' - %(CYAN)s%(BOLD)sLibraries%(RESET)s: %(sdk_libary_dir)s', **params)
-    out(' - %(CYAN)s%(BOLD)sSources%(RESET)s: %(sdk_source_dir)s', **params)
-    out(' - %(CYAN)s%(BOLD)sProgramer%(RESET)s: %(programer)s', **params)
-    out(' - %(CYAN)s%(BOLD)sSerial port%(RESET)s: %(serial)s', **params)
-    out('%(CYAN)s%(BOLD)sAVR Compiler%(RESET)s: %(avr_home)s', **params)
-    out(' - %(CYAN)s%(BOLD)scc%(RESET)s: %(cc)s', **params)
-    out(' - %(CYAN)s%(BOLD)sLD%(RESET)s: %(ld)s', **params)
-    out(' - %(CYAN)s%(BOLD)sobjcopy%(RESET)s: %(objcopy)s', **params)
-    out(' - %(CYAN)s%(BOLD)sAR%(RESET)s: %(ar)s', **params)
-    out(' - %(CYAN)s%(BOLD)sINCLUDE%(RESET)s: %(avr_include)s', **params)
-    out(' - %(CYAN)s%(BOLD)sLIB%(RESET)s: %(avr_lib)s', **params)
-    out('%(CYAN)s%(BOLD)sProject Path%(RESET)s: %(project_home)s', **params)
-    out(' - %(CYAN)s%(BOLD)sSources%(RESET)s: %(source_dir)s', **params)
-    out(' - %(CYAN)s%(BOLD)sLibrary%(RESET)s: %(lib_dir)s', **params)
-    out(' - %(CYAN)s%(BOLD)sBinary%(RESET)s: %(bin_dir)s', **params)
-    out(' - %(CYAN)s%(BOLD)sInclude%(RESET)s: %(include_dir)s', **params)
+    if params.get('clock', None) is None:
+        params.update(clock=0)
+
+    tpl = [
+        '%(CYAN)s%(BOLD)sMCU name%(RESET)s: %(mcu)s',
+        '%(CYAN)s%(BOLD)sMCU clock%(RESET)s: %(clock)0.2f MHz',
+        '%(CYAN)s%(BOLD)sVariant%(RESET)s: %(variant)s',
+        '%(CYAN)s%(BOLD)sArduino SDK%(RESET)s: %(sdk_home)s',
+        ' - %(CYAN)s%(BOLD)sVariants%(RESET)s: %(sdk_variant_dir)s',
+        ' - %(CYAN)s%(BOLD)sLibraries%(RESET)s: %(sdk_libary_dir)s',
+        ' - %(CYAN)s%(BOLD)sSources%(RESET)s: %(sdk_source_dir)s',
+        ' - %(CYAN)s%(BOLD)sProgramer%(RESET)s: %(programer)s',
+        ' - %(CYAN)s%(BOLD)sSerial port%(RESET)s: %(serial)s',
+        '%(CYAN)s%(BOLD)sAVR Compiler%(RESET)s: %(avr_home)s',
+        ' - %(CYAN)s%(BOLD)scc%(RESET)s: %(cc)s',
+        ' - %(CYAN)s%(BOLD)sLD%(RESET)s: %(ld)s',
+        ' - %(CYAN)s%(BOLD)sobjcopy%(RESET)s: %(objcopy)s',
+        ' - %(CYAN)s%(BOLD)sAR%(RESET)s: %(ar)s',
+        ' - %(CYAN)s%(BOLD)sINCLUDE%(RESET)s: %(avr_include)s',
+        ' - %(CYAN)s%(BOLD)sLIB%(RESET)s: %(avr_lib)s',
+        '%(CYAN)s%(BOLD)sProject Path%(RESET)s: %(project_home)s',
+        ' - %(CYAN)s%(BOLD)sSources%(RESET)s: %(source_dir)s',
+        ' - %(CYAN)s%(BOLD)sLibrary%(RESET)s: %(lib_dir)s',
+        ' - %(CYAN)s%(BOLD)sBinary%(RESET)s: %(bin_dir)s',
+        ' - %(CYAN)s%(BOLD)sInclude%(RESET)s: %(include_dir)s'
+    ]
+    
+
+    out('\n'.join(tpl), **params)
 
 
 def variant_list(sdk_variant_dir, variant, **params):
     '''
     Mostra a lista de variantes reconhecida pela SDK do arduino.
     '''
-    for pathname in os.listdir(sdk_variant_dir):
-        path = os.path.join(sdk_variant_dir, pathname)
-        if os.path.isdir(path) and variant == pathname:
-            out(' %(GREEN)s%(BOLD)s%(pathname)s', pathname=pathname)
-        elif os.path.isdir(path):
-            out(' %(GREEN)s%(pathname)s', pathname=pathname)
+    pathname = "avr"
+    if variant == pathname:
+        out(' %(GREEN)s%(BOLD)s%(pathname)s', pathname=pathname)
+    else:
+        out(' %(GREEN)s%(pathname)s', pathname=pathname)
+        if sdk_variant_dir is not None and os.path.isdir(sdk_variant_dir) is True:
+            for pathname in os.listdir(sdk_variant_dir):
+                path = os.path.join(sdk_variant_dir, pathname)
+                if os.path.isdir(path) and variant == pathname:
+                    out(' %(GREEN)s%(BOLD)s%(pathname)s', pathname=pathname)
+                elif os.path.isdir(path):
+                    out(' %(GREEN)s%(pathname)s', pathname=pathname)
 
 
 def main():
