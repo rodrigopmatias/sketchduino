@@ -345,7 +345,6 @@ def show_command(**params):
         ' - %(CYAN)s%(BOLD)sBinary%(RESET)s: %(bin_dir)s',
         ' - %(CYAN)s%(BOLD)sInclude%(RESET)s: %(include_dir)s'
     ]
-    
 
     out('\n'.join(tpl), **params)
 
