@@ -24,7 +24,7 @@ import codecs
 import json
 import subprocess as sp
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
 
 def sdk_refresh(params):
@@ -44,14 +44,15 @@ def search(regexp, directory, notfound=None):
     flag = False
 
     for dirpath in directories:
-        for filename in os.listdir(dirpath):
-            if regexp.match(filename):
-                notfound = os.path.join(dirpath, filename)
-                flag = True
+        if os.path.isdir(dirpath) is True:
+            for filename in os.listdir(dirpath):
+                if regexp.match(filename):
+                    notfound = os.path.join(dirpath, filename)
+                    flag = True
+                if flag is True:
+                    break
             if flag is True:
                 break
-        if flag is True:
-            break
 
     return notfound
 
