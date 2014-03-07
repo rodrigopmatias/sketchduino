@@ -24,7 +24,7 @@ import codecs
 import json
 import subprocess as sp
 
-__version__ = '0.3.2'
+__version__ = '0.3.99'
 
 
 def sdk_refresh(params):
@@ -146,16 +146,7 @@ def scan_for_sources(path, basepath=None):
 
 
 def src_to_obj(src):
-    if src.endswith('.c'):
-        return src.replace('c', 'o')
-    elif src.endswith('.cc'):
-        return src.replace('cc', 'o')
-    elif src.endswith('.cpp'):
-        return src.replace('cpp', 'o')
-    elif src.endswith('.cxx'):
-        return src.replace('cxx', 'o')
-    else:
-        return None
+    return re.sub('\/', '-', re.sub('\.(c|cc|cpp|hpp|cxx)$', '.o', src))
 
 
 def sources_to_objects(sources, prefix=''):

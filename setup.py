@@ -25,6 +25,7 @@ setup(
     version=sketchduino.__version__,
     install_requires=[
         'argparse',
+        'pyserial'
     ],
     license='Apache 2.0',
     author='Rodrigo Pinheiro Matias',

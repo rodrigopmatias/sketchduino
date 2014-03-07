@@ -20,7 +20,7 @@ templates = {
 \t@$(AR) rcs %(lib)s %(obj)s
 \t@echo " [\033[33m\033[1mAR\033[0m] \033[37m\033[1m%(obj)s\033[0m to \033[37m\033[1m%(lib)s\033[0m"''',
     'obj_ruler': '''%(obj)s: %(source)s
-\t@$(CC) $(CFLAGS) $(INCLUDE) -c %(source)s -o %(obj)s 1>> compile.log
+\t@$(CC) $(CFLAGS) $(INCLUDE) -c %(source)s -o %(obj)s 1>> compile.log 2>> compile.err
 \t@echo " [\033[33m\033[1mCC\033[0m] \033[37m\033[1m%(source)s\033[0m"''',
     'avr-main.cc': '''/**
  * Generated with sketch %(version)s
@@ -177,8 +177,6 @@ $(EPP): $(AOUT)
 $(AOUT): $(OBJ)
 \t@echo " [\033[33m\033[1mLD\033[0m] \033[37m\033[1m$(AOUT)\033[0m"
 \t@$(CC) $(LD_FLAGS) $(LIB) $(OBJ) -o $(AOUT)
-
-$(CORE_LIB): $(CORE_OBJ)%(core_ruler)s
 
 %(obj_rulers)s
 
