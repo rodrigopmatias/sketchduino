@@ -27,13 +27,13 @@ templates = {
  **/
 #include <avr/sleep.h>
 
- int main(void) {
+int main(void) {
 
-    for(;;)
-        sleep_mode();
+  for(;;)
+      sleep_mode();
 
-    return 0;
- }''',
+  return 0;
+}''',
     'main.cc': '''/**
  * Generated with sketch %(version)s
  **/
@@ -73,7 +73,7 @@ INCLUDE=-I$(ARDUINO_CORE)/arduino -I$(ARDUINO_VARIANT) -I$(ARDUINO_CORE)
 #Define of MCU
 MCU=%(mcu)s
 CLOCK=%(clock_hz)sL
-ARDUINO=101
+ARDUINO=%(sdk_version)s
 
 # Define compiler flags
 CFLAGS=-Os -Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MCU) \\

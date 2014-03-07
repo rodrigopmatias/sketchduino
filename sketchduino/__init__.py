@@ -36,6 +36,12 @@ def sdk_refresh(params):
         sdk_libary_dir=os.path.sep.join([sdk_home, 'libraries']) if sdk_home else '',
     )
 
+    sdk_version = '000'
+    with open(os.path.sep.join([sdk_home, 'lib', 'version.txt'])) as fd:
+        sdk_version = fd.read().replace('.', '')
+
+    params.update(sdk_version=sdk_version)
+
     return params
 
 
