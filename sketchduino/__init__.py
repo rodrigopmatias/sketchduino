@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-'''
-Copyright 2012 Rodrigo Pinheiro Matias <rodrigopmatias@gmail.com>
+
+AA?r67u5iyu67it6yitoiuitj7uioyyuu769u65u687 78gopmatias@gmail.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
