@@ -23,7 +23,7 @@ import codecs
 import json
 import subprocess as sp
 
-__version__ = '0.3.99'
+__version__ = '0.3.3'
 
 
 def sdk_refresh(params):
