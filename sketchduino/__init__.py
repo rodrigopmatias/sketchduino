@@ -24,11 +24,11 @@ import codecs
 import json
 import subprocess as sp
 
-__version__ = '0.3.3'
+__version__ = '0.3.4'
 
 
 def sdk_refresh(params):
-    sdk_home = params.get('sdk_home')
+    sdk_home = params.get('sdk_home', None)
 
     params.update(
         sdk_variant_dir=os.path.sep.join([sdk_home, 'hardware', 'arduino', 'variants']) if sdk_home else '',
@@ -36,11 +36,12 @@ def sdk_refresh(params):
         sdk_libary_dir=os.path.sep.join([sdk_home, 'libraries']) if sdk_home else '',
     )
 
-    sdk_version = '000'
-    with open(os.path.sep.join([sdk_home, 'lib', 'version.txt'])) as fd:
-        sdk_version = fd.read().replace('.', '')
+    if sdk_home is not None:
+        sdk_version = '000'
+        with open(os.path.sep.join([sdk_home, 'lib', 'version.txt'])) as fd:
+            sdk_version = fd.read().replace('.', '')
 
-    params.update(sdk_version=sdk_version)
+        params.update(sdk_version=sdk_version)
 
     return params
 
