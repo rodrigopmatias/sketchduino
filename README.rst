@@ -72,6 +72,7 @@ SublimeText. Let's see how to use sketchduino.
                             The home directory for project.
       --programer PROGRAMER
                             The programer hardware for deploy you firmwire.
+      --serial SERIAL       The serial port for comunication with hardware.
       --variant VARIANT     The variante of your arduino.
 
 Command Help
@@ -97,6 +98,7 @@ commands with the following command:
 
      variant-list
         List of variantes of projects for arduino and AVR project.
+
      create
         Handles the project.
 
