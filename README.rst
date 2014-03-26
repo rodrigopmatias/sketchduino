@@ -127,3 +127,8 @@ commands with the following command:
 
     -------
     End of Arduino Sketch Utility.
+
+    Use sample
+    ----------
+
+    Using `sketchduino with avr project <http://www.youtube.com/watch?v=a0OtbruPAME>`_
