@@ -131,4 +131,6 @@ commands with the following command:
     Use sample
     ----------
 
-    Using `sketchduino with avr project <http://www.youtube.com/watch?v=a0OtbruPAME>`_
+    Using `sketchduino with avr project`_
+
+    ..  _sketchduino with avr project: http://www.youtube.com/watch?v=a0OtbruPAME
