@@ -95,7 +95,8 @@ commands with the following command:
      deploy
         Command not implemented yet.
 
-     variant-listNone
+     variant-list
+        List of variantes of projects for arduino and AVR project.
      create
         Handles the project.
 

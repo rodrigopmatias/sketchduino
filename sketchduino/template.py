@@ -76,9 +76,9 @@ CLOCK=%(clock_hz)sL
 ARDUINO=%(sdk_version)s
 
 # Define compiler flags
-CFLAGS=-Os -Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MCU) \\
+CFLAGS=-Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MCU) \\
           -DF_CPU=$(CLOCK) -MMD -DARDUINO=$(ARDUINO) \\
-          -fpermissive -lm -Wl,-u,vfprintf -lprintf_flt
+          -fpermissive -lm -Wl,-u,vfprintf -lprintf_min
 CCFLAGS=$(CFLAGS)
 
 # Define compiler rulers
@@ -148,8 +148,8 @@ MCU=%(mcu)s
 CLOCK=%(clock_hz)sL
 
 # Define compiler flags
-CFLAGS=-Os -Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MCU) \\
-          -DF_CPU=$(CLOCK) -MMD -fpermissive -lm -Wl,-u,vfprintf -lprintf_flt
+CFLAGS=-Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MCU) \\
+          -DF_CPU=$(CLOCK) -MMD -fpermissive -lm -Wl,-u,vfprintf -lprintf_min
 CCFLAGS=$(CFLAGS)
 
 # Define compiler rulers
