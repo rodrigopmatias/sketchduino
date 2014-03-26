@@ -27,23 +27,34 @@ created with the following structure:
 How to install this
 -------------------
 
+
 To install sketchduino is very simple, as it is a python tool you can
 install it using the tool easy\_install or pip is the second most
 recommended.
 
 See how we can install using easy\_install:
 
-    ``root@host ~/ # easy_install sketchduino``
+    ``root@host ~/ # easy_install -U sketchduino``
 
 With this command will be installed and its dependencies sketchduino
 Site Packages Python.
 
 Now see how to install using pip:
 
-    ``root@host ~/ # easy_install sketchduino``
+    ``root@host ~/ # pip install -U sketchduino``
 
 With this command will be installed and its dependencies sketchduino
 Site Packages Python.
+
+Its is compatible
+-----------------
+
+To run this tool you will need a compiler. If you want to build projects with
+variants of Arduino, you will need to have the installation of the Arduino IDE,
+if working eat AVR variant you need the AVR toolchain Gnu / GCC Compiler.
+In the case of using Arduino, there is a limitation in the maximum version
+1.0.5 may be used. Is being developed compatibility with the next version of
+the Arduino IDE but this is not yet ready.
 
 How to use this
 ---------------
