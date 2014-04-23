@@ -24,7 +24,7 @@ import codecs
 import json
 import subprocess as sp
 
-__version__ = '0.3.5'
+__version__ = '0.3.6'
 
 
 def sdk_refresh(params):
@@ -82,9 +82,11 @@ def find_avr_toolchain(params):
         avr_libdir = os.path.join(avr_home, 'lib')
 
         params.update(
-            cc=search(re.compile('^(avr\-g\+\+|g\+\+)$'), [avr_bindir, '/usr/bin'], 'not found'),
+            cxx=search(re.compile('^(avr\-g\+\+|g\+\+)$'), [avr_bindir, '/usr/bin'], 'not found'),
+            cc=search(re.compile('^(avr\-gcc|gcc)$'), [avr_bindir, '/usr/bin'], 'not found'),
             ld=search(re.compile('^(avr\-ld|ld)$'), [avr_bindir, '/usr/bin'], 'not found'),
             objcopy=search(re.compile('^(avr\-objcopy|objcopy)$'), [avr_bindir, '/usr/bin'], 'not found'),
+            size=search(re.compile('^(avr\-size|size)$'), [avr_bindir, '/usr/bin'], 'not found'),
             avr_include=avr_includedir,
             avr_lib=avr_libdir,
             ar=search(re.compile('^(avr\-ar|ar)$'), [avr_bindir, '/usr/bin'], 'not found'),
@@ -173,10 +175,16 @@ def ruler_for(sources, source_dir='', obj_dir='', prefix=''):
 
     for source in sources:
         obj = src_to_obj(source)
-        rulers.append(templates.get('obj_ruler') % {
-            'obj': os.path.join(obj_dir, '-'.join([prefix, obj])),
-            'source': os.path.join(source_dir, source)
-        })
+        if re.match(r'^.*\.c$', source):
+            rulers.append(templates.get('c_obj_ruler') % {
+                'obj': os.path.join(obj_dir, '-'.join([prefix, obj])),
+                'source': os.path.join(source_dir, source)
+            })
+        else:
+            rulers.append(templates.get('cxx_obj_ruler') % {
+                'obj': os.path.join(obj_dir, '-'.join([prefix, obj])),
+                'source': os.path.join(source_dir, source)
+            })
 
     return '\n\n'.join(rulers)
 

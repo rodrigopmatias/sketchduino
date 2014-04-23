@@ -19,20 +19,22 @@ templates = {
     'static_link': '''
 \t@$(AR) rcs %(lib)s %(obj)s
 \t@echo " [\033[33m\033[1mAR\033[0m] \033[37m\033[1m%(obj)s\033[0m to \033[37m\033[1m%(lib)s\033[0m"''',
-    'obj_ruler': '''%(obj)s: %(source)s
+    'c_obj_ruler': '''%(obj)s: %(source)s
 \t@$(CC) $(CFLAGS) $(INCLUDE) -c %(source)s -o %(obj)s 1>> compile.log 2>> compile.err
 \t@echo " [\033[33m\033[1mCC\033[0m] \033[37m\033[1m%(source)s\033[0m"''',
+    'cxx_obj_ruler': '''%(obj)s: %(source)s
+\t@$(CXX) $(CXXFLAGS) $(INCLUDE) -c %(source)s -o %(obj)s 1>> compile.log 2>> compile.err
+\t@echo " [\033[33m\033[1mCXX\033[0m] \033[37m\033[1m%(source)s\033[0m"''',
     'avr-main.cc': '''/**
  * Generated with sketch %(version)s
  **/
 #include <avr/sleep.h>
 
 int main(void) {
+    for(;;)
+        sleep_mode();
 
-  for(;;)
-      sleep_mode();
-
-  return 0;
+    return 0;
 }''',
     'main.cc': '''/**
  * Generated with sketch %(version)s
@@ -62,9 +64,11 @@ ARDUINO_VARIANT=$(ARDUINO_HOME)/hardware/arduino/variants/%(variant)s
 
 # Define toolchain
 CC=%(cc)s
+CXX=%(cxx)s
 LD=%(ld)s
 AR=%(ar)s
 OBJCOPY=%(objcopy)s
+SIZE=%(size)s
 AVRDUDE=%(avrdude)s
 PROGRAMER=%(programer)s
 LIB=
@@ -72,14 +76,15 @@ INCLUDE=-I$(ARDUINO_CORE)/arduino -I$(ARDUINO_VARIANT) -I$(ARDUINO_CORE)
 
 #Define of MCU
 MCU=%(mcu)s
-CLOCK=%(clock_hz)sL
+CLOCK=%(clock_hz)sUL
 ARDUINO=%(sdk_version)s
 
 # Define compiler flags
-CFLAGS=-Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MCU) \\
+_CFLAGS=-Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MCU) \\
           -DF_CPU=$(CLOCK) -MMD -DARDUINO=$(ARDUINO) \\
           -fpermissive -lm -Wl,-u,vfprintf -lprintf_min
-CCFLAGS=$(CFLAGS)
+CFLAGS=$(_CFLAGS) -std=c99
+CXXFLAGS=$(_CFLAGS) -std=c++98
 
 # Define compiler rulers
 OBJ=%(obj_dep)s
@@ -94,6 +99,8 @@ AVRDUDE_OPTIONS = -p$(MCU) -c$(PROGRAMER) -P%(serial)s -Uflash:w:$(HEX):i
 
 all: $(HEX) $(EPP)
 
+rebuild: clean all
+
 deploy: $(HEX)
 \t$(AVRDUDE) $(AVRDUDE_OPTIONS)
 
@@ -105,9 +112,12 @@ $(EPP): $(AOUT)
 \t@echo " [\033[33m\033[1mOBJCOPY\033[0m] \033[37m\033[1mMemory of EEPROM\033[0m"
 \t@$(OBJCOPY) -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $(AOUT) $(EPP)
 
+size: $(AOUT)
+\t@$(SIZE) -C $(AOUT) --mcu=$(MCU)
+
 $(AOUT): $(OBJ) $(CORE_LIB)
 \t@echo " [\033[33m\033[1mLD\033[0m] \033[37m\033[1m$(AOUT)\033[0m"
-\t@$(CC) $(LD_FLAGS) $(LIB) $(OBJ) $(CORE_LIB) -o $(AOUT)
+\t@$(CXX) $(LD_FLAGS) $(LIB) $(OBJ) $(CORE_LIB) -o $(AOUT)
 
 $(CORE_LIB): $(CORE_OBJ)%(core_ruler)s
 
@@ -135,9 +145,11 @@ clean:
 
 # Define toolchain
 CC=%(cc)s
+CXX=%(cxx)s
 LD=%(ld)s
 AR=%(ar)s
 OBJCOPY=%(objcopy)s
+SIZE=%(size)s
 AVRDUDE=%(avrdude)s
 PROGRAMER=%(programer)s
 LIB=
@@ -145,12 +157,13 @@ INCLUDE=
 
 #Define of MCU
 MCU=%(mcu)s
-CLOCK=%(clock_hz)sL
+CLOCK=%(clock_hz)sUL
 
 # Define compiler flags
-CFLAGS=-Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MCU) \\
-          -DF_CPU=$(CLOCK) -MMD -fpermissive -lm -Wl,-u,vfprintf -lprintf_min
-CCFLAGS=$(CFLAGS)
+_CFLAGS=-Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MCU) \\
+          -DF_CPU=$(CLOCK) -fpermissive -lm -Wl,-u,vfprintf -lprintf_min
+CFLAGS=$(_CFLAGS) -std=c99
+CXXFLAGS=$(_CFLAGS) -std=c++98
 
 # Define compiler rulers
 OBJ=%(obj_dep)s
@@ -163,6 +176,8 @@ AVRDUDE_OPTIONS = -p$(MCU) -c$(PROGRAMER) -P%(serial)s -Uflash:w:$(HEX):i
 
 all: $(HEX) $(EPP)
 
+rebuild: clean all
+
 deploy: $(HEX)
 \t$(AVRDUDE) $(AVRDUDE_OPTIONS)
 
@@ -174,9 +189,12 @@ $(EPP): $(AOUT)
 \t@echo " [\033[33m\033[1mOBJCOPY\033[0m] \033[37m\033[1mMemory of EEPROM\033[0m"
 \t@$(OBJCOPY) -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $(AOUT) $(EPP)
 
+size: $(AOUT)
+\t@$(SIZE) -A $(AOUT)
+
 $(AOUT): $(OBJ)
 \t@echo " [\033[33m\033[1mLD\033[0m] \033[37m\033[1m$(AOUT)\033[0m"
-\t@$(CC) $(LD_FLAGS) $(LIB) $(OBJ) -o $(AOUT)
+\t@$(CXX) $(LD_FLAGS) $(LIB) $(OBJ) -o $(AOUT)
 
 %(obj_rulers)s
 
