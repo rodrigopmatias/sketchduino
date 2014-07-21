@@ -95,7 +95,7 @@ EPP=binary/%(project_name)s-%(mcu)s.epp
 CORE_LIB=binary/core.a
 LD_FLAGS=-Os -Wl,--gc-sections -mmcu=$(MCU) -lm
 
-AVRDUDE_OPTIONS = -p$(MCU) -c$(PROGRAMER) -P%(serial)s -Uflash:w:$(HEX):i
+AVRDUDE_OPTIONS = -p$(MCU) -c$(PROGRAMER) %(pgrextra)s -Uflash:w:$(HEX):i
 
 all: $(HEX) $(EPP)
 
@@ -172,7 +172,7 @@ HEX=binary/%(project_name)s-%(mcu)s.hex
 EPP=binary/%(project_name)s-%(mcu)s.epp
 LD_FLAGS=-Os -Wl,--gc-sections -mmcu=$(MCU) -lm
 
-AVRDUDE_OPTIONS = -p$(MCU) -c$(PROGRAMER) -P%(serial)s -Uflash:w:$(HEX):i
+AVRDUDE_OPTIONS = -p$(MCU) -c$(PROGRAMER) %(pgrextra)s -Uflash:w:$(HEX):i
 
 all: $(HEX) $(EPP)
 

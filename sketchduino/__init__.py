@@ -24,7 +24,7 @@ import codecs
 import json
 import subprocess as sp
 
-__version__ = '0.3.6'
+__version__ = '0.3.7'
 
 
 def sdk_refresh(params):
@@ -202,12 +202,27 @@ def core_ruler(sources, prefix, obj_dir, library):
     return rst
 
 
+def gen_pgr_extra(serial=None, baudrate=None, **params):
+    params = []
+
+    if serial:
+        params.append('-P')
+        params.append(serial)
+
+    if baudrate:
+        params.append('-b')
+        params.append(baudrate)
+
+    return ' '.join(params)
+
+
 def create_or_update_makefile(sdk_source_dir, **params):
     project_home = params.get('project_home')
     sources = scan_for_sources(params.get('source_dir'))
     core_sources = scan_for_sources(sdk_source_dir)
 
     params.update(
+        pgrextra=gen_pgr_extra(**params),
         version=__version__,
         clock_hz=int((params.get('clock', 0) or 0) * 10 ** 6),
         project_name=project_home.split(os.path.sep)[-1],
@@ -259,6 +274,7 @@ def create_or_update_command(command=None, **kargs):
             find_avr_toolchain(kargs)
         )
     )
+
     project_home = kargs.get('project_home')
     temp_dir = os.path.join(project_home, 'tmp')
     out('Creating sketch in %(CYAN)s%(project_home)s', endline='%(RESET)s ', **params)
@@ -381,6 +397,8 @@ def main():
         params.update(project_home=os.getcwd())
 
     apply_if(params, load_sketch_conf(params.get('project_home')))
+
+    print(json.dumps(params, indent=4))
 
     out('%(GRAY)s%(BOLD)sStart of Arduino Sketch Utility.')
     out('%(BOLD)s-------')

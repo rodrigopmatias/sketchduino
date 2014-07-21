@@ -72,6 +72,13 @@ def parse_args():
     )
 
     parse.add_argument(
+        '--baudrate',
+        dest='baudrate',
+        default=None,
+        help='The serial baudrate for comunication with hardware.',
+    )
+
+    parse.add_argument(
         '--variant',
         dest='variant',
         help='The variante of your arduino.'
