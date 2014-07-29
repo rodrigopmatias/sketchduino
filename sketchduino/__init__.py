@@ -24,7 +24,7 @@ import codecs
 import json
 import subprocess as sp
 
-__version__ = '0.3.7'
+__version__ = '0.4.0'
 
 
 def sdk_refresh(params):
@@ -90,6 +90,7 @@ def find_avr_toolchain(params):
             avr_include=avr_includedir,
             avr_lib=avr_libdir,
             ar=search(re.compile('^(avr\-ar|ar)$'), [avr_bindir, '/usr/bin'], 'not found'),
+            asm=search(re.compile('^(avr\-as|as)$'), [avr_bindir, '/usr/bin'], 'not found'),
             avrdude=search(re.compile('^avrdude(|64)$'), [avr_home, '/usr/bin'], 'not found')
         )
 
@@ -158,6 +159,10 @@ def src_to_obj(src):
     return re.sub('\/', '-', re.sub('\.(c|cc|cpp|hpp|cxx)$', '.o', src))
 
 
+def src_to_asm(src):
+    return re.sub('\/', '-', re.sub('\.(c|cc|cpp|hpp|cxx)$', '.s', src))
+
+
 def sources_to_objects(sources, prefix=''):
     objs = []
     for src in sources:
@@ -170,21 +175,65 @@ def sources_to_objects(sources, prefix=''):
     return objs
 
 
-def ruler_for(sources, source_dir='', obj_dir='', prefix=''):
+def sources_to_asm(sources, prefix=''):
+    objs = []
+    for src in sources:
+        src = src_to_asm(src)
+        src = src.replace(os.path.sep, '-')
+        src = '-'.join([prefix, src])
+
+        objs.append(os.path.join('tmp', src))
+
+    return objs
+
+
+def asm_ruler_for(sources, source_dir='', obj_dir='', prefix=''):
     rulers = []
 
     for source in sources:
-        obj = src_to_obj(source)
+        obj = src_to_asm(source)
         if re.match(r'^.*\.c$', source):
-            rulers.append(templates.get('c_obj_ruler') % {
+            rulers.append(templates.get('c_asm_ruler') % {
                 'obj': os.path.join(obj_dir, '-'.join([prefix, obj])),
                 'source': os.path.join(source_dir, source)
             })
         else:
-            rulers.append(templates.get('cxx_obj_ruler') % {
+            rulers.append(templates.get('cxx_asm_ruler') % {
                 'obj': os.path.join(obj_dir, '-'.join([prefix, obj])),
                 'source': os.path.join(source_dir, source)
             })
+
+    return '\n\n'.join(rulers)
+
+
+def ruler_for(sources, source_dir='', obj_dir='', prefix=''):
+    rulers = []
+
+    for source in sources:
+        obj = src_to_asm(source)
+        if re.match(r'^.*\.c$', source):
+            rulers.append(templates.get('c_asm_ruler') % {
+                'obj': os.path.join(obj_dir, '-'.join([prefix, obj])),
+                'source': os.path.join(source_dir, source)
+            })
+        else:
+            rulers.append(templates.get('cxx_asm_ruler') % {
+                'obj': os.path.join(obj_dir, '-'.join([prefix, obj])),
+                'source': os.path.join(source_dir, source)
+            })
+
+    return '\n\n'.join(rulers)
+
+
+def obj_ruler_for(sources, source_dir='', obj_dir='', prefix=''):
+    rulers = []
+
+    for source in sources:
+        obj = src_to_obj(source)
+        rulers.append(templates.get('asm_obj_ruler') % {
+            'obj': os.path.join(obj_dir, '-'.join([prefix, obj])),
+            'source': os.path.join(obj_dir, '-'.join([prefix, src_to_asm(source)]))
+        })
 
     return '\n\n'.join(rulers)
 
@@ -233,8 +282,13 @@ def create_or_update_makefile(sdk_source_dir, **params):
         obj_dep=' '.join(
             sources_to_objects(sources, prefix='sketch')
         ),
-        obj_rulers=ruler_for(sources, 'src', 'tmp', 'sketch'),
-        core_obj_rulers=ruler_for(core_sources, sdk_source_dir, 'tmp', 'core'),
+        asm_dep=' '.join(
+            sources_to_asm(sources, prefix='sketch')
+        ),
+        asm_rulers=asm_ruler_for(sources, 'src', 'tmp', 'sketch'),
+        obj_rulers=obj_ruler_for(sources, 'src', 'tmp', 'sketch'),
+        core_asm_rulers=asm_ruler_for(core_sources, sdk_source_dir, 'tmp', 'core'),
+        core_obj_rulers=obj_ruler_for(core_sources, sdk_source_dir, 'tmp', 'core'),
     )
     filename = os.path.join(project_home, 'Makefile')
     rst = '?'

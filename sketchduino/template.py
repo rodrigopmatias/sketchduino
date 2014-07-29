@@ -22,8 +22,17 @@ templates = {
     'c_obj_ruler': '''%(obj)s: %(source)s
 \t@$(CC) $(CFLAGS) $(INCLUDE) -c %(source)s -o %(obj)s 1>> compile.log 2>> compile.err
 \t@echo " [\033[33m\033[1mCC\033[0m] \033[37m\033[1m%(source)s\033[0m"''',
+    'asm_obj_ruler': '''%(obj)s: %(source)s
+\t@$(AS) $(ASFLAGS) -o %(obj)s %(source)s 1>> compile.log 2>> compile.err
+\t@echo " [\033[33m\033[1mAS\033[0m] \033[37m\033[1m%(source)s\033[0m"''',
+    'c_asm_ruler': '''%(obj)s: %(source)s
+\t@$(CC) $(CFLAGS) $(INCLUDE) -c %(source)s -S -o %(obj)s 1>> compile.log 2>> compile.err
+\t@echo " [\033[33m\033[1mCC\033[0m] \033[37m\033[1m%(source)s\033[0m"''',
     'cxx_obj_ruler': '''%(obj)s: %(source)s
 \t@$(CXX) $(CXXFLAGS) $(INCLUDE) -c %(source)s -o %(obj)s 1>> compile.log 2>> compile.err
+\t@echo " [\033[33m\033[1mCXX\033[0m] \033[37m\033[1m%(source)s\033[0m"''',
+    'cxx_asm_ruler': '''%(obj)s: %(source)s
+\t@$(CXX) $(CXXFLAGS) $(INCLUDE) -c %(source)s -S -o %(obj)s 1>> compile.log 2>> compile.err
 \t@echo " [\033[33m\033[1mCXX\033[0m] \033[37m\033[1m%(source)s\033[0m"''',
     'avr-main.cc': '''/**
  * Generated with sketch %(version)s
@@ -65,6 +74,7 @@ ARDUINO_VARIANT=$(ARDUINO_HOME)/hardware/arduino/variants/%(variant)s
 # Define toolchain
 CC=%(cc)s
 CXX=%(cxx)s
+AS=%(asm)s
 LD=%(ld)s
 AR=%(ar)s
 OBJCOPY=%(objcopy)s
@@ -85,6 +95,7 @@ _CFLAGS=-Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MC
           -fpermissive -lm -Wl,-u,vfprintf -lprintf_min
 CFLAGS=$(_CFLAGS) -std=c99
 CXXFLAGS=$(_CFLAGS) -std=c++98
+ASFLAGS=-mmcu $(MCU)
 
 # Define compiler rulers
 OBJ=%(obj_dep)s
@@ -97,9 +108,13 @@ LD_FLAGS=-Os -Wl,--gc-sections -mmcu=$(MCU) -lm
 
 AVRDUDE_OPTIONS = -p$(MCU) -c$(PROGRAMER) %(pgrextra)s -Uflash:w:$(HEX):i
 
-SIZE_OPTS=-C -mmcu=$(MCU)
+SIZE_OPTS=-C --mcu=$(MCU)
 
-include Makefile.config
+CONFIG_EXISTS=$(shell [ -e "Makefile.config" ] && echo 1 || echo 0)
+
+ifeq ($(CONFIG_EXISTS), 1)
+  include Makefile.config
+endif
 
 all: $(HEX) $(EPP)
 
@@ -125,7 +140,11 @@ $(AOUT): $(OBJ) $(CORE_LIB)
 
 $(CORE_LIB): $(CORE_OBJ)%(core_ruler)s
 
+%(asm_rulers)s
+
 %(obj_rulers)s
+
+%(core_asm_rulers)s
 
 %(core_obj_rulers)s
 
@@ -150,6 +169,7 @@ clean:
 # Define toolchain
 CC=%(cc)s
 CXX=%(cxx)s
+AS=%(asm)s
 LD=%(ld)s
 AR=%(ar)s
 OBJCOPY=%(objcopy)s
@@ -168,8 +188,10 @@ _CFLAGS=-Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MC
           -DF_CPU=$(CLOCK) -fpermissive -lm -Wl,-u,vfprintf -lprintf_min
 CFLAGS=$(_CFLAGS) -std=c99
 CXXFLAGS=$(_CFLAGS) -std=c++98
+ASFLAGS=-mmcu $(MCU)
 
 # Define compiler rulers
+ASM=%(asm_dep)s
 OBJ=%(obj_dep)s
 AOUT=binary/%(project_name)s-%(mcu)s.elf
 HEX=binary/%(project_name)s-%(mcu)s.hex
@@ -180,7 +202,12 @@ AVRDUDE_OPTIONS = -p$(MCU) -c$(PROGRAMER) %(pgrextra)s -Uflash:w:$(HEX):i
 
 SIZE_OPTS=-A
 
-include Makefile.config
+CONFIG_EXISTS=$(shell [ -e "Makefile.config" ] && echo 1 || echo 0)
+
+ifeq ($(CONFIG_EXISTS), 1)
+  include Makefile.config
+endif
+
 all: $(HEX) $(EPP)
 
 rebuild: clean all
@@ -202,6 +229,8 @@ size: $(AOUT)
 $(AOUT): $(OBJ)
 \t@echo " [\033[33m\033[1mLD\033[0m] \033[37m\033[1m$(AOUT)\033[0m"
 \t@$(CXX) $(LD_FLAGS) $(LIB) $(OBJ) -o $(AOUT)
+
+%(asm_rulers)s
 
 %(obj_rulers)s
 

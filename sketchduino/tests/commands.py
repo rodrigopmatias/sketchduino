@@ -47,11 +47,30 @@ class HelpersTestCase(ProjectBaseTestCase, TestCase):
         assert src_to_obj('main.cpp') == 'main.o'
         assert src_to_obj('main.cxx') == 'main.o'
 
+
+    def test_src_to_asm(self):
+        assert src_to_asm('main.c') == 'main.s'
+        assert src_to_asm('main.cc') == 'main.s'
+        assert src_to_asm('main.cpp') == 'main.s'
+        assert src_to_asm('main.cxx') == 'main.s'
+
     def test_find_avr_toolchain(self):
         rst = find_avr_toolchain(self.conf)
 
         self.assertEqual(
             rst.get('cc', None),
+            os.path.sep.join([
+                self.conf.get('sdk_home'),
+                'hardware',
+                'tools',
+                'avr',
+                'bin',
+                'avr-gcc'
+            ])
+        )
+
+        self.assertEqual(
+            rst.get('cxx', None),
             os.path.sep.join([
                 self.conf.get('sdk_home'),
                 'hardware',
