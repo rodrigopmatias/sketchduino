@@ -24,7 +24,7 @@ import codecs
 import json
 import subprocess as sp
 
-__version__ = '0.4.0'
+__version__ = '0.4.1'
 
 
 def sdk_refresh(params):
@@ -452,7 +452,7 @@ def main():
 
     apply_if(params, load_sketch_conf(params.get('project_home')))
 
-    print(json.dumps(params, indent=4))
+    # print(json.dumps(params, indent=4))
 
     out('%(GRAY)s%(BOLD)sStart of Arduino Sketch Utility.')
     out('%(BOLD)s-------')
