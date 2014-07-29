@@ -97,6 +97,10 @@ LD_FLAGS=-Os -Wl,--gc-sections -mmcu=$(MCU) -lm
 
 AVRDUDE_OPTIONS = -p$(MCU) -c$(PROGRAMER) %(pgrextra)s -Uflash:w:$(HEX):i
 
+SIZE_OPTS=-C -mmcu=$(MCU)
+
+include Makefile.config
+
 all: $(HEX) $(EPP)
 
 rebuild: clean all
@@ -113,7 +117,7 @@ $(EPP): $(AOUT)
 \t@$(OBJCOPY) -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $(AOUT) $(EPP)
 
 size: $(AOUT)
-\t@$(SIZE) -C $(AOUT) --mcu=$(MCU)
+\t@$(SIZE) $(SIZE_OPTS) $(AOUT)
 
 $(AOUT): $(OBJ) $(CORE_LIB)
 \t@echo " [\033[33m\033[1mLD\033[0m] \033[37m\033[1m$(AOUT)\033[0m"
@@ -174,6 +178,9 @@ LD_FLAGS=-Os -Wl,--gc-sections -mmcu=$(MCU) -lm
 
 AVRDUDE_OPTIONS = -p$(MCU) -c$(PROGRAMER) %(pgrextra)s -Uflash:w:$(HEX):i
 
+SIZE_OPTS=-A
+
+include Makefile.config
 all: $(HEX) $(EPP)
 
 rebuild: clean all
@@ -190,7 +197,7 @@ $(EPP): $(AOUT)
 \t@$(OBJCOPY) -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $(AOUT) $(EPP)
 
 size: $(AOUT)
-\t@$(SIZE) -A $(AOUT)
+\t@$(SIZE) $(SIZE_OPTS) $(AOUT)
 
 $(AOUT): $(OBJ)
 \t@echo " [\033[33m\033[1mLD\033[0m] \033[37m\033[1m$(AOUT)\033[0m"
