@@ -24,7 +24,7 @@ import codecs
 import json
 import subprocess as sp
 
-__version__ = '0.4.1'
+__version__ = '0.5.1'
 
 
 def sdk_refresh(params):
@@ -265,12 +265,65 @@ def gen_pgr_extra(serial=None, baudrate=None, **params):
     return ' '.join(params)
 
 
+def detect_libraries(lib_dir, **kwargs):
+    rst = {}
+
+    for name in [item for item in os.listdir(lib_dir) if item not in ['.', '..']]:
+        path = os.path.join('lib', name)
+        if os.path.isdir(path):
+            sources = scan_for_sources(path)
+            rst.update({
+                name: {
+                    'path': path,
+                    'asm_dep': sources_to_asm(sources, prefix=name),
+                    'obj_dep': sources_to_objects(sources, prefix=name),
+                    'obj_rulers': obj_ruler_for(sources, path, 'tmp', name),
+                    'asm_rulers': asm_ruler_for(sources, path, 'tmp', name)
+                }
+            })
+
+    return rst
+
+
+def linker_ruler_for(objs, out=''):
+    rulers = []
+
+    for obj in objs:
+        rulers.append(templates.get('static_link') % {
+            'obj': obj,
+            'lib': out
+        })
+
+    return '\n'.join(rulers)
+
+
+def lib_ruler_for(name, conf):
+    tpl = '''binary/%(name)s.a: %(obj_deps)s%(linker)s
+
+%(obj_rulers)s
+
+%(asm_rulers)s
+'''
+
+    return tpl % {
+        'name': name,
+        'obj_deps': ' '.join(conf.get('obj_dep')),
+        'linker': linker_ruler_for(conf.get('obj_dep'), 'binary/%s.a' % name),
+        'obj_rulers': conf.get('obj_rulers'),
+        'asm_rulers': conf.get('asm_rulers')
+    }
+
+
 def create_or_update_makefile(sdk_source_dir, **params):
     project_home = params.get('project_home')
     sources = scan_for_sources(params.get('source_dir'))
     core_sources = scan_for_sources(sdk_source_dir)
 
+    libs = detect_libraries(**params)
+
     params.update(
+        libs_rulers=''.join([lib_ruler_for(name, conf) for name, conf in libs.items()]),
+        lib_deps=' '.join(['binary/%s.a' % name for name in libs.keys()]),
         pgrextra=gen_pgr_extra(**params),
         version=__version__,
         clock_hz=int((params.get('clock', 0) or 0) * 10 ** 6),
@@ -410,10 +463,12 @@ def show_command(**params):
         ' - %(CYAN)s%(BOLD)sProgramer%(RESET)s: %(programer)s',
         ' - %(CYAN)s%(BOLD)sSerial port%(RESET)s: %(serial)s',
         '%(CYAN)s%(BOLD)sAVR Compiler%(RESET)s: %(avr_home)s',
-        ' - %(CYAN)s%(BOLD)scc%(RESET)s: %(cc)s',
+        ' - %(CYAN)s%(BOLD)sCC%(RESET)s: %(cc)s',
         ' - %(CYAN)s%(BOLD)sLD%(RESET)s: %(ld)s',
-        ' - %(CYAN)s%(BOLD)sobjcopy%(RESET)s: %(objcopy)s',
+        ' - %(CYAN)s%(BOLD)sOBJCOPY%(RESET)s: %(objcopy)s',
         ' - %(CYAN)s%(BOLD)sAR%(RESET)s: %(ar)s',
+        ' - %(CYAN)s%(BOLD)sASM%(RESET)s: %(asm)s',
+        ' - %(CYAN)s%(BOLD)sSIZE%(RESET)s: %(size)s',
         ' - %(CYAN)s%(BOLD)sINCLUDE%(RESET)s: %(avr_include)s',
         ' - %(CYAN)s%(BOLD)sLIB%(RESET)s: %(avr_lib)s',
         '%(CYAN)s%(BOLD)sProject Path%(RESET)s: %(project_home)s',

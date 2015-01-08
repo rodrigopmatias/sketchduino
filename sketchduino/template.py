@@ -18,22 +18,22 @@ limitations under the License.
 templates = {
     'static_link': '''
 \t@$(AR) rcs %(lib)s %(obj)s
-\t@echo " [\033[33m\033[1mAR\033[0m] \033[37m\033[1m%(obj)s\033[0m to \033[37m\033[1m%(lib)s\033[0m"''',
+\t@echo " [\033[33m\033[1mAR\033[0m]      - \033[37m\033[1m%(obj)s\033[0m to \033[37m\033[1m%(lib)s\033[0m"''',
     'c_obj_ruler': '''%(obj)s: %(source)s
 \t@$(CC) $(CFLAGS) $(INCLUDE) -c %(source)s -o %(obj)s 1>> compile.log 2>> compile.err
-\t@echo " [\033[33m\033[1mCC\033[0m] \033[37m\033[1m%(source)s\033[0m"''',
+\t@echo " [\033[33m\033[1mCC\033[0m]      - \033[37m\033[1m%(source)s\033[0m"''',
     'asm_obj_ruler': '''%(obj)s: %(source)s
 \t@$(AS) $(ASFLAGS) -o %(obj)s %(source)s 1>> compile.log 2>> compile.err
-\t@echo " [\033[33m\033[1mAS\033[0m] \033[37m\033[1m%(source)s\033[0m"''',
+\t@echo " [\033[33m\033[1mAS\033[0m]      - \033[37m\033[1m%(source)s\033[0m"''',
     'c_asm_ruler': '''%(obj)s: %(source)s
 \t@$(CC) $(CFLAGS) $(INCLUDE) -c %(source)s -S -o %(obj)s 1>> compile.log 2>> compile.err
-\t@echo " [\033[33m\033[1mCC\033[0m] \033[37m\033[1m%(source)s\033[0m"''',
+\t@echo " [\033[33m\033[1mCC\033[0m]      - \033[37m\033[1m%(source)s\033[0m"''',
     'cxx_obj_ruler': '''%(obj)s: %(source)s
 \t@$(CXX) $(CXXFLAGS) $(INCLUDE) -c %(source)s -o %(obj)s 1>> compile.log 2>> compile.err
-\t@echo " [\033[33m\033[1mCXX\033[0m] \033[37m\033[1m%(source)s\033[0m"''',
+\t@echo " [\033[33m\033[1mCXX\033[0m]     - \033[37m\033[1m%(source)s\033[0m"''',
     'cxx_asm_ruler': '''%(obj)s: %(source)s
 \t@$(CXX) $(CXXFLAGS) $(INCLUDE) -c %(source)s -S -o %(obj)s 1>> compile.log 2>> compile.err
-\t@echo " [\033[33m\033[1mCXX\033[0m] \033[37m\033[1m%(source)s\033[0m"''',
+\t@echo " [\033[33m\033[1mCXX\033[0m]     - \033[37m\033[1m%(source)s\033[0m"''',
     'avr-main.cc': '''/**
  * Generated with sketch %(version)s
  **/
@@ -82,7 +82,7 @@ SIZE=%(size)s
 AVRDUDE=%(avrdude)s
 PROGRAMER=%(programer)s
 LIB=
-INCLUDE=-I$(ARDUINO_CORE)/arduino -I$(ARDUINO_VARIANT) -I$(ARDUINO_CORE)
+INCLUDE=-I$(ARDUINO_CORE)/arduino -I$(ARDUINO_VARIANT) -I$(ARDUINO_CORE) -I lib/
 
 #Define of MCU
 MCU=%(mcu)s
@@ -104,6 +104,7 @@ AOUT=binary/%(project_name)s-%(mcu)s.elf
 HEX=binary/%(project_name)s-%(mcu)s.hex
 EPP=binary/%(project_name)s-%(mcu)s.epp
 CORE_LIB=binary/core.a
+LIB_DEPS=%(lib_deps)s
 LD_FLAGS=-Os -Wl,--gc-sections -mmcu=$(MCU) -lm
 
 AVRDUDE_OPTIONS = -p$(MCU) -c$(PROGRAMER) %(pgrextra)s -Uflash:w:$(HEX):i
@@ -124,19 +125,19 @@ deploy: $(HEX)
 \t$(AVRDUDE) $(AVRDUDE_OPTIONS)
 
 $(HEX): $(EPP)
-\t@echo " [\033[33m\033[1mOBJCOPY\033[0m] \033[37m\033[1mFirmware\033[0m"
+\t@echo " [\033[33m\033[1mOBJCOPY\033[0m] - \033[37m\033[1mFirmware\033[0m"
 \t@$(OBJCOPY) -O ihex -R .eeprom $(AOUT) $(HEX)
 
 $(EPP): $(AOUT)
-\t@echo " [\033[33m\033[1mOBJCOPY\033[0m] \033[37m\033[1mMemory of EEPROM\033[0m"
+\t@echo " [\033[33m\033[1mOBJCOPY\033[0m] - \033[37m\033[1mMemory of EEPROM\033[0m"
 \t@$(OBJCOPY) -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $(AOUT) $(EPP)
 
 size: $(AOUT)
 \t@$(SIZE) $(SIZE_OPTS) $(AOUT)
 
-$(AOUT): $(OBJ) $(CORE_LIB)
-\t@echo " [\033[33m\033[1mLD\033[0m] \033[37m\033[1m$(AOUT)\033[0m"
-\t@$(CXX) $(LD_FLAGS) $(LIB) $(OBJ) $(CORE_LIB) -o $(AOUT)
+$(AOUT): clear-compiler $(OBJ) $(CORE_LIB) $(LIB_DEPS)
+\t@echo " [\033[33m\033[1mLD\033[0m]      - \033[37m\033[1m$(AOUT)\033[0m"
+\t@$(CXX) $(LD_FLAGS) $(LIB) $(OBJ) $(CORE_LIB) $(LIB_DEPS) -o $(AOUT)
 
 $(CORE_LIB): $(CORE_OBJ)%(core_ruler)s
 
@@ -144,22 +145,28 @@ $(CORE_LIB): $(CORE_OBJ)%(core_ruler)s
 
 %(obj_rulers)s
 
+%(libs_rulers)s
+
 %(core_asm_rulers)s
 
 %(core_obj_rulers)s
 
+clear-compiler:
+\t@echo " [\033[33m\033[1mRM\033[0m]      - Clear compiler logs"
+\trm -f compile.*
+
 clean-tmp:
-\t@echo " [\033[33m\033[1mRM\033[0m] Clear temporary files"
+\t@echo " [\033[33m\033[1mRM\033[0m]      - Clear temporary files"
 \t@rm -f tmp/*
 
 clean-bin:
-\t@echo " [\033[33m\033[1mRM\033[0m] Clear binary files"
+\t@echo " [\033[33m\033[1mRM\033[0m]      - Clear binary files"
 \t@rm -f binary/*
 
 clean:
-\t@echo " [\033[33m\033[1mRM\033[0m] Clear temporary files"
+\t@echo " [\033[33m\033[1mRM\033[0m]      - Clear temporary files"
 \t@rm -f tmp/*
-\t@echo " [\033[33m\033[1mRM\033[0m] Clear binary files"
+\t@echo " [\033[33m\033[1mRM\033[0m]      - Clear binary files"
 \t@rm -f binary/*
 ''',
     'avr-Makefile': '''##########################################
@@ -177,7 +184,7 @@ SIZE=%(size)s
 AVRDUDE=%(avrdude)s
 PROGRAMER=%(programer)s
 LIB=
-INCLUDE=
+INCLUDE=-I lib/
 
 #Define of MCU
 MCU=%(mcu)s
@@ -193,6 +200,7 @@ ASFLAGS=-mmcu $(MCU)
 # Define compiler rulers
 ASM=%(asm_dep)s
 OBJ=%(obj_dep)s
+LIB_DEPS=%(lib_deps)s
 AOUT=binary/%(project_name)s-%(mcu)s.elf
 HEX=binary/%(project_name)s-%(mcu)s.hex
 EPP=binary/%(project_name)s-%(mcu)s.epp
@@ -216,36 +224,42 @@ deploy: $(HEX)
 \t$(AVRDUDE) $(AVRDUDE_OPTIONS)
 
 $(HEX): $(EPP)
-\t@echo " [\033[33m\033[1mOBJCOPY\033[0m] \033[37m\033[1mFirmware\033[0m"
+\t@echo " [\033[33m\033[1mOBJCOPY\033[0m] - \033[37m\033[1mFirmware\033[0m"
 \t@$(OBJCOPY) -O ihex -R .eeprom $(AOUT) $(HEX)
 
 $(EPP): $(AOUT)
-\t@echo " [\033[33m\033[1mOBJCOPY\033[0m] \033[37m\033[1mMemory of EEPROM\033[0m"
+\t@echo " [\033[33m\033[1mOBJCOPY\033[0m] - \033[37m\033[1mMemory of EEPROM\033[0m"
 \t@$(OBJCOPY) -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $(AOUT) $(EPP)
 
 size: $(AOUT)
 \t@$(SIZE) $(SIZE_OPTS) $(AOUT)
 
-$(AOUT): $(OBJ)
-\t@echo " [\033[33m\033[1mLD\033[0m] \033[37m\033[1m$(AOUT)\033[0m"
-\t@$(CXX) $(LD_FLAGS) $(LIB) $(OBJ) -o $(AOUT)
+$(AOUT): clear-compiler $(OBJ) $(LIB_DEPS)
+\t@echo " [\033[33m\033[1mLD\033[0m]      - \033[37m\033[1m$(AOUT)\033[0m"
+\t@$(CXX) $(LD_FLAGS) $(LIB) $(OBJ) $(LIB_DEPS) -o $(AOUT)
 
 %(asm_rulers)s
 
 %(obj_rulers)s
 
+%(libs_rulers)s
+
+clear-compiler:
+\t@echo " [\033[33m\033[1mRM\033[0m]      - Clear compiler logs"
+\t@rm -f compile.*
+
 clean-tmp:
-\t@echo " [\033[33m\033[1mRM\033[0m] Clear temporary files"
+\t@echo " [\033[33m\033[1mRM\033[0m]      - Clear temporary files"
 \t@rm -f tmp/*
 
 clean-bin:
-\t@echo " [\033[33m\033[1mRM\033[0m] Clear binary files"
+\t@echo " [\033[33m\033[1mRM\033[0m]      - Clear binary files"
 \t@rm -f binary/*
 
 clean:
-\t@echo " [\033[33m\033[1mRM\033[0m] Clear temporary files"
+\t@echo " [\033[33m\033[1mRM\033[0m]      - Clear temporary files"
 \t@rm -f tmp/*
-\t@echo " [\033[33m\033[1mRM\033[0m] Clear binary files"
+\t@echo " [\033[33m\033[1mRM\033[0m]      - Clear binary files"
 \t@rm -f binary/*
 '''
 }
