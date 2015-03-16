@@ -24,7 +24,7 @@ import codecs
 import json
 import subprocess as sp
 
-__version__ = '0.5.1'
+__version__ = '0.5.3'
 
 
 def sdk_refresh(params):
@@ -46,20 +46,33 @@ def sdk_refresh(params):
     return params
 
 
-def search(regexp, directory, notfound=None):
-    directories = [directory] if isinstance(directory, (tuple, list)) is False else directory
+def search(patterns, directory, notfound=None):
+    directories = tuple([directory]) if not isinstance(directory, (tuple, list)) else directory
+    patterns = tuple([patterns]) if not isinstance(patterns, (tuple, list)) else patterns
+    rst = notfound
+
+    for pattern in patterns:
+        compiled = re.compile(pattern)
+        rst = search_for_pattern(compiled, directories, notfound)
+
+        if rst != notfound:
+            break
+
+    return rst
+
+
+def search_for_pattern(pattern, directories, notfound):
     flag = False
 
     for dirpath in directories:
-        if os.path.isdir(dirpath) is True:
-            for filename in os.listdir(dirpath):
-                if regexp.match(filename):
-                    notfound = os.path.join(dirpath, filename)
-                    flag = True
-                if flag is True:
-                    break
+        for filename in os.listdir(dirpath):
+            if pattern.match(filename):
+                notfound = os.path.join(dirpath, filename)
+                flag = True
             if flag is True:
                 break
+        if flag is True:
+            break
 
     return notfound
 
@@ -82,16 +95,16 @@ def find_avr_toolchain(params):
         avr_libdir = os.path.join(avr_home, 'lib')
 
         params.update(
-            cxx=search(re.compile('^(avr\-g\+\+|g\+\+)$'), [avr_bindir, '/usr/bin'], 'not found'),
-            cc=search(re.compile('^(avr\-gcc|gcc)$'), [avr_bindir, '/usr/bin'], 'not found'),
-            ld=search(re.compile('^(avr\-ld|ld)$'), [avr_bindir, '/usr/bin'], 'not found'),
-            objcopy=search(re.compile('^(avr\-objcopy|objcopy)$'), [avr_bindir, '/usr/bin'], 'not found'),
-            size=search(re.compile('^(avr\-size|size)$'), [avr_bindir, '/usr/bin'], 'not found'),
+            cxx=search((r'^avr\-g\+\+$', r'^g\+\+$'), [avr_bindir, '/usr/bin'], 'not found'),
+            cc=search((r'^avr\-gcc$', r'^gcc$'), [avr_bindir, '/usr/bin'], 'not found'),
+            ld=search((r'^avr\-ld$', r'^ld$'), [avr_bindir, '/usr/bin'], 'not found'),
+            objcopy=search((r'^avr\-objcopy$', r'^objcopy$'), [avr_bindir, '/usr/bin'], 'not found'),
+            size=search((r'^avr\-size$', r'^size$'), [avr_bindir, '/usr/bin'], 'not found'),
             avr_include=avr_includedir,
             avr_lib=avr_libdir,
-            ar=search(re.compile('^(avr\-ar|ar)$'), [avr_bindir, '/usr/bin'], 'not found'),
-            asm=search(re.compile('^(avr\-as|as)$'), [avr_bindir, '/usr/bin'], 'not found'),
-            avrdude=search(re.compile('^avrdude(|64)$'), [avr_home, '/usr/bin'], 'not found')
+            ar=search((r'^avr\-ar$', r'^ar$'), [avr_bindir, '/usr/bin'], 'not found'),
+            asm=search((r'^avr\-as$', r'^as$'), [avr_bindir, '/usr/bin'], 'not found'),
+            avrdude=search('^avrdude(|64)$', [avr_home, '/usr/bin'], 'not found')
         )
 
     return params
@@ -499,6 +512,12 @@ def variant_list(sdk_variant_dir, variant, **params):
                     out(' %(GREEN)s%(pathname)s', pathname=pathname)
 
 
+def version_cmd(*args, **kwargs):
+    '''
+    Mostra a versão do sketchduino.
+    '''
+    out('Sketchduino version %(BOLD)s%(GREEN)s%(version)s', version=__version__)
+
 def main():
     params = parse_args()
 
@@ -521,6 +540,7 @@ def main():
         'variant-list': variant_list,
         'library-list': not_implemented,
         'show': show_command,
+        'version': version_cmd,
     }
 
     cmd = params.get('command')
